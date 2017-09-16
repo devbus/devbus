@@ -1,12 +1,11 @@
 package services
 
 import (
-	"github.com/devbus/devbus/models"
-	"github.com/devbus/devbus/daos"
-	"crypto/sha256"
 	"bytes"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"crypto/sha256"
+
+	"github.com/devbus/devbus/daos"
+	"github.com/devbus/devbus/models"
 )
 
 type UserService interface {
@@ -19,17 +18,17 @@ func GetUserService() UserService {
 }
 
 type userServiceImpl struct {
-
 }
 
 func (*userServiceImpl) Auth(email, password string) (ok bool) {
-	o := orm.NewOrm()
-	dao := daos.NewUserDao(o)
+	db := models.DBOpen()
+	defer db.Close()
+	dao := daos.NewUserDao(db)
 	user := dao.GetUserByEmail(email)
 	if user != nil {
 		hashedPassword := sha256.Sum256([]byte(password + user.Salt))
 		if bytes.Compare(hashedPassword[:], []byte(user.Password)) == 0 {
-			logs.Debug("password error, user: %s", email)
+			log.Debug("password error, user: %s", email)
 			return true
 		}
 	}
@@ -37,7 +36,8 @@ func (*userServiceImpl) Auth(email, password string) (ok bool) {
 }
 
 func (*userServiceImpl) Register(user *models.User) (err error) {
-	o := orm.NewOrm()
-	dao := daos.NewUserDao(o)
+	db := models.DBOpen()
+	defer db.Close()
+	dao := daos.NewUserDao(db)
 	return dao.AddUser(user)
 }

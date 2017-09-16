@@ -1,16 +1,12 @@
 package models
 
-import (
-	"github.com/astaxie/beego/orm"
-)
-
 type Project struct {
-	Id          int32
+	ID          int32
 	Name        string `valid:"Required;Max(256)"`
 	Description string
 	DescType    TextType
 }
 
-func init() {
-	orm.RegisterModel(new(Project))
+func (Project) TableName() string {
+	return "project"
 }

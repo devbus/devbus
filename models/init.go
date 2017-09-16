@@ -1,24 +1,29 @@
 package models
 
 import (
-	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego"
 	"fmt"
+
+	"github.com/devbus/devbus/common"
+	"github.com/jinzhu/gorm"
+	"github.com/kuun/slog"
 	_ "github.com/lib/pq"
-	"github.com/astaxie/beego/logs"
+	"github.com/pkg/errors"
 )
 
-func init() {
-	orm.Debug = true
-	db := beego.AppConfig.String("db")
-	user := beego.AppConfig.String("dbUser")
-	password := beego.AppConfig.String("dbPassword")
-	host := beego.AppConfig.String("dbHost")
+var log = slog.GetLogger()
+
+func DBOpen() *gorm.DB {
+
 	dbSource := fmt.Sprintf("user=%s password=%s host=%s port=5432 dbname=%s sslmode=disable",
-		user, password, host, db)
-	logs.Debug("db dbSource: %s", dbSource)
-	orm.RegisterDataBase(
-		"default", "postgres",
-		dbSource,
-	)
+		common.Config.DBUser,
+		common.Config.DBPassword,
+		common.Config.DBHost,
+		common.Config.DB)
+	log.Debug("db dbSource: %s", dbSource)
+	if db, err := gorm.Open("postgres", dbSource); err != nil {
+		log.Errorf("%+v", errors.Wrapf(err, "failed to open database"))
+		return nil
+	} else {
+		return db
+	}
 }

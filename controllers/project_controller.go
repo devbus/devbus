@@ -1,36 +1,52 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego/logs"
+	"strconv"
+
 	"github.com/devbus/devbus/daos"
 	"github.com/devbus/devbus/models"
+	"github.com/gin-gonic/gin"
+	"github.com/kuun/slog"
 )
 
-type ProjectController struct {
-	jsonApiController
-}
+var projectLog = slog.GetLogger()
 
-func (ctrl *ProjectController) Get() {
+func getProject(context *gin.Context) {
 	var err error
 
 	var projs []*models.Project
 	dao := new(daos.ProjectDAO)
-	if id, err := ctrl.GetInt("id"); err == nil {
-		if proj, err := dao.GetById(int32(id)); err != nil {
-			logs.Info("error: %+v", err)
-			goto FAIL
-		} else {
-			projs = append(projs, proj)
+	if id := context.Query("id"); id != "" {
+		if i, err := strconv.Atoi(id); err != nil {
+			if proj, err := dao.GetById(int32(i)); err != nil {
+				projectLog.Info("error: %+v", err)
+				goto FAIL
+			} else {
+				renderData(context, proj)
+				return
+			}
 		}
 	} else {
 		projs = dao.GetAll()
 	}
-	ctrl.renderData(projs)
+	renderData(context, projs)
 	return
 FAIL:
-	ctrl.renderError(err)
+	renderError(context, err)
 }
 
-func (ctrl *ProjectController) Post() {
+func createProject(context *gin.Context) {
 
+}
+
+func modifyProject(context *gin.Context) {
+
+}
+
+func init() {
+	var router = gin.Default().Group("/api/project")
+
+	router.GET("/", getProject)
+	router.POST("/", createProject)
+	router.PUT("/", modifyProject)
 }

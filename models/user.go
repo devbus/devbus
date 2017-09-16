@@ -1,15 +1,14 @@
 package models
 
-import "github.com/astaxie/beego/orm"
-
 type User struct {
-	Id       int32  `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Salt     string
-	Password string `json:"password"`
+	ID         int32  `json:"id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Salt       string
+	Password   string `json:"password"`
+	IsActivate bool   `json:"is_activate"`
 }
 
-func init() {
-	orm.RegisterModelWithPrefix("devbus_", new(User))
+func (User) TableName() string {
+	return "devbus_user"
 }

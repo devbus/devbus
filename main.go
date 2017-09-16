@@ -1,53 +1,57 @@
 package main
 
 import (
-	_ "github.com/devbus/devbus/routers"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/session"
-	"encoding/json"
-	"github.com/astaxie/beego/context"
 	"strings"
+
+	"flag"
+	"fmt"
+	"os"
+
+	"net/http"
+
+	"github.com/devbus/devbus/common"
+	_ "github.com/devbus/devbus/controllers"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
-var globalSessions *session.Manager
-
-func init() {
-	conf := `
-{
-  "cookieName": "gosessionid",
-  "enableSetCookie,omitempty": true,
-  "gclifetime": 3600,
-  "maxLifetime": 3600,
-  "secure": false,
-  "sessionIDHashFunc": "sha1",
-  "sessionIDHashKey": "",
-  "cookieLifeTime": 3600,
-  "providerConfig": ""
-}
-	`
-	mc := &session.ManagerConfig{}
-	json.Unmarshal([]byte(conf), mc)
-	globalSessions, _ = session.NewManager("memory", mc)
-	go globalSessions.GC()
-}
-
-// handle
-func init() {
-	beego.InsertFilter("*", beego.BeforeExec, func(ctx *context.Context) {
-		sess := ctx.Input.CruSession
-		if sess == nil {
-			uri := ctx.Request.RequestURI
-			if !strings.HasPrefix(uri, "/api/session") &&
-				!strings.HasSuffix(uri, ".html") &&
-				!strings.HasSuffix(uri, ".js") &&
-				!strings.HasSuffix(uri, ".css") &&
-				!strings.HasSuffix(uri, "*font") {
-				ctx.Redirect(302, "/app/session.html")
-			}
+func authFilter(context *gin.Context) {
+	uri := context.Request.URL.Path
+	session := sessions.Default(context)
+	if session.Get("uid") == nil {
+		if !strings.HasPrefix(uri, "/api/session") &&
+			!strings.HasPrefix(uri, "/app") &&
+			!strings.HasPrefix(uri, "/static") {
+			context.Redirect(http.StatusFound, "/app/session.html")
 		}
-	})
+	}
 }
 
 func main() {
-	beego.Run()
+	flag.Parse()
+	if *flag.Bool("h", false, "show usage") {
+		flag.Usage()
+		return
+	}
+	confPath := flag.String("conf", "", "devbus config file")
+	if *confPath == "" {
+		flag.Usage()
+		return
+	}
+	if err := common.Parse(*confPath); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to parse devbus config, error: %+v", err)
+		os.Exit(1)
+	}
+
+	router := gin.Default()
+
+	store := sessions.NewCookieStore([]byte("secret"))
+	router.Use(sessions.Sessions("devbus", store))
+
+	router.Static("/app", "webapp/dist")
+	router.Static("/static", "webapp/dist/static")
+
+	router.Use(authFilter)
+
+	router.Run(":8080")
 }
