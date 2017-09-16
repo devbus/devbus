@@ -2,6 +2,9 @@
 	"ImportPath": "github.com/devbus/devbus",
 	"GoVersion": "go1.9",
 	"GodepVersion": "v79",
+	"Packages": [
+		"github.com/astaxie/beego"
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/astaxie/beego",
