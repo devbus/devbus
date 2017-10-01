@@ -1,4 +1,4 @@
-package controllers
+package apis
 
 import (
 	"github.com/devbus/devbus/common"
@@ -6,17 +6,14 @@ import (
 	"github.com/devbus/devbus/services"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/kuun/slog"
 )
 
-var userLog = slog.GetLogger()
-
-func login(context *gin.Context) {
+func Login(context *gin.Context) {
 	var service services.UserService
 	user := &models.User{}
 	err := context.BindJSON(user)
 	if err != nil {
-		userLog.Debug("failed to parse request data, error: %+v", err)
+		log.Debug("failed to parse request data, error: %+v", err)
 		goto FAIL
 	}
 	if err != nil || user.Email == "" || user.Password == "" {
@@ -32,12 +29,12 @@ FAIL:
 	renderErrorCode(context, common.ErrPasswrod)
 }
 
-func register(context *gin.Context) {
+func Register(context *gin.Context) {
 	var service services.UserService
 	user := &models.User{}
 	err := context.BindJSON(user)
 	if err != nil {
-		userLog.Debug("failed to parse request, error: %v", err)
+		log.Debug("failed to parse request, error: %v", err)
 		goto FAIL
 	}
 	service = services.GetUserService()
@@ -50,18 +47,7 @@ FAIL:
 	renderError(context, err)
 }
 
-func activate(context *gin.Context) {
+func Activate(context *gin.Context) {
 
 }
 
-func modifyPassword(context *gin.Context) {
-
-}
-
-func init() {
-	router := gin.Default().Group("/api/user")
-	router.POST("/login", login)
-	router.POST("/register", register)
-	router.GET("/activate", activate)
-	router.PUT("/password", modifyPassword)
-}

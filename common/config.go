@@ -38,7 +38,7 @@ func Parse(confPath string) error {
 		return errors.New("section 'db' is required")
 	}
 
-	if key, err = section.GetKey("DB"); err != nil {
+	if key, err = section.GetKey("db"); err != nil {
 		return errors.New("field 'db' in section 'db' is required")
 	}
 	Config.DB = key.Value()

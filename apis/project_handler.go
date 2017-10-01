@@ -1,4 +1,4 @@
-package controllers
+package apis
 
 import (
 	"strconv"
@@ -11,7 +11,7 @@ import (
 
 var projectLog = slog.GetLogger()
 
-func getProject(context *gin.Context) {
+func GetProject(context *gin.Context) {
 	var err error
 
 	var projs []*models.Project
@@ -35,18 +35,15 @@ FAIL:
 	renderError(context, err)
 }
 
-func createProject(context *gin.Context) {
+func CreateProject(context *gin.Context) {
 
 }
 
-func modifyProject(context *gin.Context) {
+func ModifyProject(context *gin.Context) {
 
 }
 
-func init() {
-	var router = gin.Default().Group("/api/project")
+func DeleteProject(context *gin.Context)  {
 
-	router.GET("/", getProject)
-	router.POST("/", createProject)
-	router.PUT("/", modifyProject)
 }
+
