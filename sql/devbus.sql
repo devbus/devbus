@@ -1,10 +1,11 @@
 CREATE TABLE IF NOT EXISTS devbus_user (
-  id        SERIAL4 PRIMARY KEY,
-  name      VARCHAR(36),
-  email     VARCHAR(128),
-  salt      VARCHAR(20),
-  password  VARCHAR(64),
-  full_name VARCHAR(64)
+  id          SERIAL4 PRIMARY KEY,
+  name        VARCHAR(36)  NOT NULL UNIQUE,
+  email       VARCHAR(128) NOT NULL UNIQUE,
+  salt        VARCHAR(20)  NOT NULL,
+  password    VARCHAR(64)  NOT NULL,
+  full_name   VARCHAR(64)  NOT NULL,
+  is_activate BOOLEAN      NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS project (
