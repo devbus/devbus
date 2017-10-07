@@ -5,6 +5,7 @@ import (
 	"github.com/devbus/devbus/models"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 type UserDao struct {
@@ -16,18 +17,25 @@ func NewUserDao(db *gorm.DB) *UserDao {
 }
 
 func (dao *UserDao) GetUserByEmail(email string) *models.User {
-	user := &models.User{Email: email}
-	if dao.DB.Find(user); dao.Error != nil {
-		log.Debug("failed to query user email: %v", dao.Error)
+	user := &models.User{}
+	if err := dao.Where("email = ?", email).First(user).Error; err != nil {
+		log.Debugf("failed to query user email: %v", err)
 		return nil
 	}
 	return user
 }
 
 func (dao *UserDao) AddUser(user *models.User) error {
-	if !dao.DB.NewRecord(user) {
-		log.Debug("%+v", errors.Wrapf(dao.DB.Error, "failed to create new user, user: %+v", user))
-		return common.OpError{}
+	if err := dao.Create(user).Error; err != nil {
+		log.Debugf("%+v", errors.Wrapf(err, "failed to create new user, user: %+v", user))
+		errStr := err.Error()
+		errCode := common.ErrUnknown
+		if strings.Contains(errStr, "devbus_user_name_key") {
+			errCode = common.ErrConflictUserName
+		} else if strings.Contains(errStr, "devbus_user_email_key") {
+			errCode = common.ErrConflictEmail
+		}
+		return common.OpError{errCode}
 	}
 	return nil
 }

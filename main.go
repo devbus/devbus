@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/devbus/devbus/apis"
 	"github.com/devbus/devbus/common"
-	"github.com/gin-gonic/gin"
 	"github.com/devbus/devbus/router"
+	"github.com/gin-gonic/gin"
 )
 
 var help = flag.Bool("h", false, "show usage")

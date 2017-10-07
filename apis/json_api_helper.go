@@ -16,9 +16,9 @@ func renderError(context *gin.Context, err error) {
 
 	if opErr, ok = err.(common.OpError); !ok {
 		opErr = common.OpError{common.ErrUnknown}
-		jsonApiLog.Error("handle unknown error: %+v", err)
+		jsonApiLog.Errorf("handle unknown error: %+v", err)
 	} else {
-		jsonApiLog.Debug("handle error: %s", err)
+		jsonApiLog.Debugf("handle error: %s", err)
 	}
 	result := &common.RestResult{}
 	result.SetError(opErr)

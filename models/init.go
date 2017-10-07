@@ -19,7 +19,7 @@ func DBOpen() *gorm.DB {
 		common.Config.DBPassword,
 		common.Config.DBHost,
 		common.Config.DB)
-	log.Debug("db dbSource: %s", dbSource)
+	// log.Debugf("db dbSource: %s", dbSource)
 	if db, err := gorm.Open("postgres", dbSource); err != nil {
 		log.Errorf("%+v", errors.Wrapf(err, "failed to open database"))
 		return nil

@@ -16,13 +16,12 @@ func Login(context *gin.Context) {
 		log.Debug("failed to parse request data, error: %+v", err)
 		goto FAIL
 	}
-	if err != nil || user.Email == "" || user.Password == "" {
-		goto FAIL
-	}
+	service = services.GetUserService()
 	if service.Auth(user.Email, user.Password) {
 		session := sessions.Default(context)
 		session.Save()
 		renderData(context, nil)
+		log.Debugf("user login successfully, user: %s", user.Email)
 		return
 	}
 FAIL:
@@ -38,7 +37,7 @@ func Register(context *gin.Context) {
 		goto FAIL
 	}
 	service = services.GetUserService()
-	if err := service.Register(user); err != nil {
+	if err = service.Register(user); err != nil {
 		goto FAIL
 	}
 	renderData(context, nil)
