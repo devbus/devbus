@@ -28,7 +28,7 @@ func Login(context *gin.Context) {
 		return
 	}
 FAIL:
-	renderErrorCode(context, common.ErrPasswrod)
+	renderErrorCode(context, common.ErrUserPasswrod)
 }
 
 func Register(context *gin.Context) {

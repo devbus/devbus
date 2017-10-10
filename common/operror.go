@@ -12,11 +12,16 @@ type ErrorCode string
 
 const (
 	// General Error Code
-	ErrUnknown ErrorCode = "ERR_UNKNOWN"
+	ErrUnknown  ErrorCode = "ERR_UNKNOWN"
+	ErrArgument ErrorCode = "ERR_ARGUMENT"
+
 	// User management Error Code
-	ErrPasswrod         ErrorCode = "ERR_PASSWORD"
-	ErrConflictEmail    ErrorCode = "ERR_CONFLICT_EMAIL"
-	ErrConflictUserName ErrorCode = "ERR_CONFLICT_USER_NAME"
+	ErrUserPasswrod      ErrorCode = "ERR_USER_PASSWORD"
+	ErrUserConflictEmail ErrorCode = "ERR_USER_CONFLICT_EMAIL"
+	ErrUserConflictName  ErrorCode = "ERR_USER_CONFLICT_NAME"
+	ErrUserNotFound      ErrorCode = "ERR_USER_NOT_FOUND"
+	ErrUserSamePassword  ErrorCode = "ERR_USER_SAME_PASSWORD"
+
 	// Project Error Code
 	ErrProjectNotFound ErrorCode = "ERR_PROJECT_NOT_FOUND"
 	ErrProjectCreate   ErrorCode = "ERR_PROJECT_CREATE"

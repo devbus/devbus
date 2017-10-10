@@ -1,11 +1,12 @@
 package daos
 
 import (
+	"strings"
+
 	"github.com/devbus/devbus/common"
 	"github.com/devbus/devbus/models"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 type UserDao struct {
@@ -31,11 +32,24 @@ func (dao *UserDao) AddUser(user *models.User) error {
 		errStr := err.Error()
 		errCode := common.ErrUnknown
 		if strings.Contains(errStr, "devbus_user_name_key") {
-			errCode = common.ErrConflictUserName
+			errCode = common.ErrUserConflictName
 		} else if strings.Contains(errStr, "devbus_user_email_key") {
-			errCode = common.ErrConflictEmail
+			errCode = common.ErrUserConflictEmail
 		}
-		return common.OpError{errCode}
+		return common.OpError{Code: errCode}
+	}
+	return nil
+}
+
+func (dao *UserDao) ModifyPassword(user *models.User) error {
+	err := dao.Model(user).UpdateColumn("password", user.Password).Error
+	if err != nil {
+		errStr := err.Error()
+		errCode := common.ErrUnknown
+		if strings.Contains(errStr, "devbus_user_email_key") {
+			errCode = common.ErrUserNotFound
+		}
+		return common.OpError{Code: errCode}
 	}
 	return nil
 }
