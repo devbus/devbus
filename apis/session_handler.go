@@ -19,7 +19,10 @@ func Login(context *gin.Context) {
 	service = services.GetUserService()
 	if service.Auth(user.Email, user.Password) {
 		session := sessions.Default(context)
-		session.Save()
+		session.Set("uid", user.Email)
+		if err := session.Save(); err != nil {
+			log.Errorf("failed to save session, error: %+v", err)
+		}
 		renderData(context, nil)
 		log.Debugf("user login successfully, user: %s", user.Email)
 		return
